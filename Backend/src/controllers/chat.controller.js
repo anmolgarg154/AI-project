@@ -9,8 +9,9 @@ export const askQuestion =
   async (req, res, next) => {
 
     try {
-
+console.log("0")
       const { question } = req.body;
+console.log("1")
 
       if (!question) {
         return res.status(400).json({
@@ -19,11 +20,13 @@ export const askQuestion =
             "Question is required"
         });
       }
+console.log("2")
 
       const answer =
         await generateAIResponse(
           question
         );
+console.log("3")
 
       const conversation =
         await Conversation.create({

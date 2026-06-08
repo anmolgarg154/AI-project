@@ -10,6 +10,8 @@ const client = new OpenAI({
 
 export const generateAIResponse = async (question) => {
   try {
+    console.log("21")
+
     const completion = await client.chat.completions.create({
       model: "google/gemma-4-31b-it:free",
       messages: [
@@ -23,6 +25,7 @@ export const generateAIResponse = async (question) => {
         },
       ],
     });
+console.log("22",completion)
 
     return completion.choices[0].message.content;
   } catch (error) {
