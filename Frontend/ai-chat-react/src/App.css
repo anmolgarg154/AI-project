@@ -2,33 +2,42 @@
   display: flex;
   height: 100vh;
   font-family: Arial;
+  background: #f5f5f5;
 }
 
-/* Sidebar */
+/* SIDEBAR */
 .sidebar {
   width: 280px;
   background: #111827;
   color: white;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
-.newBtn {
-  width: 100%;
+.btn {
   padding: 10px;
-  background: #22c55e;
-  border: none;
-  color: white;
-  cursor: pointer;
   margin-bottom: 10px;
-}
-
-.chatItem {
-  padding: 10px;
+  border: none;
   cursor: pointer;
-  border-bottom: 1px solid #333;
+  color: white;
 }
 
-.chatItem:hover {
+.new {
+  background: #22c55e;
+}
+
+.theme {
+  background: #374151;
+}
+
+.item {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+}
+
+.item:hover {
   background: #1f2937;
 }
 
@@ -36,7 +45,7 @@
   background: #374151;
 }
 
-/* Chat */
+/* CHAT */
 .chat {
   flex: 1;
   display: flex;
@@ -51,17 +60,17 @@
 
 .user {
   text-align: right;
-  margin: 10px;
   background: #dcfce7;
   padding: 10px;
+  margin: 10px;
   border-radius: 10px;
 }
 
 .ai {
   text-align: left;
-  margin: 10px;
   background: #e5e7eb;
   padding: 10px;
+  margin: 10px;
   border-radius: 10px;
 }
 
@@ -70,7 +79,6 @@
   color: gray;
 }
 
-/* Input */
 .inputBox {
   display: flex;
   padding: 10px;
@@ -88,4 +96,34 @@ button {
   color: white;
   border: none;
   cursor: pointer;
+}
+
+/* DARK MODE */
+.dark {
+  background: #0b0f19;
+  color: white;
+}
+
+.dark .sidebar {
+  background: #0f172a;
+}
+
+.dark .chat {
+  background: #0b0f19;
+}
+
+.dark .user {
+  background: #1f2937;
+  color: white;
+}
+
+.dark .ai {
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.dark input {
+  background: #111827;
+  color: white;
+  border: 1px solid #333;
 }

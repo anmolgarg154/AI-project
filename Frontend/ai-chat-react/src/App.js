@@ -5,12 +5,19 @@ import "./App.css";
 function App() {
   const [sessions, setSessions] = useState([]);
   const [activeId, setActiveId] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [dark, setDark] = useState(false);
 
   const activeSession = sessions.find((s) => s.id === activeId);
 
-  // Load history on start
+  // Load theme
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") setDark(true);
+  }, []);
+
+  // Load history
   useEffect(() => {
     const load = async () => {
       const data = await getHistory();
@@ -18,10 +25,10 @@ function App() {
       const session = {
         id: Date.now(),
         title: "Saved Chat",
-        messages: data.map((d) => [
+        messages: data.flatMap((d) => [
           { role: "user", text: d.question },
           { role: "ai", text: d.answer },
-        ]).flat(),
+        ]),
       };
 
       setSessions([session]);
@@ -32,42 +39,38 @@ function App() {
   }, []);
 
   // NEW CHAT
-  const handleNewChat = () => {
-    const newSession = {
+  const newChat = () => {
+    const session = {
       id: Date.now(),
       title: "New Chat",
       messages: [],
     };
 
-    setSessions((prev) => [newSession, ...prev]);
-    setActiveId(newSession.id);
+    setSessions((prev) => [session, ...prev]);
+    setActiveId(session.id);
   };
 
-  // SEND MESSAGE (WITH LOADING)
+  // SEND MESSAGE
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMsg = { role: "user", text: input };
 
-    // add user message immediately
-    const updated = sessions.map((s) =>
-      s.id === activeId
-        ? { ...s, messages: [...s.messages, userMsg] }
-        : s
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === activeId
+          ? { ...s, messages: [...s.messages, userMsg] }
+          : s
+      )
     );
 
-    setSessions(updated);
     setInput("");
     setLoading(true);
 
     try {
-      // 🔥 AI call
       const res = await sendMessage(input);
 
-      const aiMsg = {
-        role: "ai",
-        text: res.answer,
-      };
+      const aiMsg = { role: "ai", text: res.answer };
 
       setSessions((prev) =>
         prev.map((s) =>
@@ -83,21 +86,34 @@ function App() {
     setLoading(false);
   };
 
+  // toggle theme
+  const toggleTheme = () => {
+    setDark((prev) => {
+      localStorage.setItem("theme", !prev ? "dark" : "light");
+      return !prev;
+    });
+  };
+
   return (
-    <div className="app">
+    <div className={dark ? "app dark" : "app"}>
 
       {/* SIDEBAR */}
       <div className="sidebar">
-        <button className="newBtn" onClick={handleNewChat}>
+
+        <button className="btn new" onClick={newChat}>
           + New Chat
         </button>
 
-        <h3>History</h3>
+        <button className="btn theme" onClick={toggleTheme}>
+          {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
+        </button>
+
+        <h3>Chats</h3>
 
         {sessions.map((s) => (
           <div
             key={s.id}
-            className={`chatItem ${activeId === s.id ? "active" : ""}`}
+            className={`item ${activeId === s.id ? "active" : ""}`}
             onClick={() => setActiveId(s.id)}
           >
             {s.title}
@@ -105,7 +121,7 @@ function App() {
         ))}
       </div>
 
-      {/* CHAT AREA */}
+      {/* CHAT */}
       <div className="chat">
 
         <div className="messages">
@@ -118,7 +134,6 @@ function App() {
             </div>
           ))}
 
-          {/* 🔥 LOADING INDICATOR */}
           {loading && (
             <div className="ai typing">
               🤖 Thinking...
@@ -126,7 +141,6 @@ function App() {
           )}
         </div>
 
-        {/* INPUT */}
         <div className="inputBox">
           <input
             value={input}
