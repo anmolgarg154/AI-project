@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { sendMessage, getHistory } from "./api/chatApi";
+import {sendMessage, getHistory} from "./api/chatApi";
+
 import "./App.css";
 
 function App() {
@@ -9,36 +10,81 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [dark, setDark] = useState(false);
 
-  const activeSession = sessions.find((s) => s.id === activeId);
+  const activeSession = sessions.find(
+    (s) => s.id === activeId
+  );
 
-  // Load theme
+  // Theme Load
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") setDark(true);
+    const savedTheme =
+      localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      setDark(true);
+    }
   }, []);
 
-  // Load history
+  // Load History
   useEffect(() => {
-    const load = async () => {
-      const data = await getHistory();
+    const loadHistory = async () => {
+      try {
+        const history =
+          await getHistory();
 
-      const session = {
-        id: Date.now(),
-        title: "Saved Chat",
-        messages: data.flatMap((d) => [
-          { role: "user", text: d.question },
-          { role: "ai", text: d.answer },
-        ]),
-      };
+        if (
+          history &&
+          history.length > 0
+        ) {
+          const session = {
+            id: Date.now(),
+            title: "Previous Chats",
+            messages: history.flatMap(
+              (item) => [
+                {
+                  role: "user",
+                  text: item.question,
+                },
+                {
+                  role: "ai",
+                  text: item.answer,
+                },
+              ]
+            ),
+          };
 
-      setSessions([session]);
-      setActiveId(session.id);
+          setSessions([session]);
+          setActiveId(session.id);
+        } else {
+          const newSession = {
+            id: Date.now(),
+            title: "New Chat",
+            messages: [],
+          };
+
+          setSessions([newSession]);
+          setActiveId(newSession.id);
+        }
+      } catch (error) {
+        console.error(
+          "History Load Error:",
+          error
+        );
+
+        const newSession = {
+          id: Date.now(),
+          title: "New Chat",
+          messages: [],
+        };
+
+        setSessions([newSession]);
+        setActiveId(newSession.id);
+      }
     };
 
-    load();
+    loadHistory();
   }, []);
 
-  // NEW CHAT
+  // Create New Chat
   const newChat = () => {
     const session = {
       id: Date.now(),
@@ -46,93 +92,162 @@ function App() {
       messages: [],
     };
 
-    setSessions((prev) => [session, ...prev]);
+    setSessions((prev) => [
+      session,
+      ...prev,
+    ]);
+
     setActiveId(session.id);
   };
 
-  // SEND MESSAGE
+  // Send Message
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMsg = { role: "user", text: input };
+    if (loading) return;
+
+    const currentInput = input;
+
+    const userMessage = {
+      role: "user",
+      text: currentInput,
+    };
+
+    setInput("");
 
     setSessions((prev) =>
-      prev.map((s) =>
-        s.id === activeId
-          ? { ...s, messages: [...s.messages, userMsg] }
-          : s
+      prev.map((session) =>
+        session.id === activeId
+          ? {
+              ...session,
+              messages: [
+                ...session.messages,
+                userMessage,
+              ],
+            }
+          : session
       )
     );
 
-    setInput("");
     setLoading(true);
 
     try {
-      const res = await sendMessage(input);
+      const conversation =
+        await sendMessage(
+          currentInput
+        );
 
-      const aiMsg = { role: "ai", text: res.answer };
+      const aiMessage = {
+        role: "ai",
+        text:
+          conversation.answer,
+      };
 
       setSessions((prev) =>
-        prev.map((s) =>
-          s.id === activeId
-            ? { ...s, messages: [...s.messages, aiMsg] }
-            : s
+        prev.map((session) =>
+          session.id === activeId
+            ? {
+                ...session,
+                messages: [
+                  ...session.messages,
+                  aiMessage,
+                ],
+              }
+            : session
         )
       );
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (error) {
+      console.error(
+        "Send Error:",
+        error
+      );
 
-    setLoading(false);
+      alert(
+        error.message ||
+          "Failed to get AI response"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // toggle theme
+  // Theme Toggle
   const toggleTheme = () => {
     setDark((prev) => {
-      localStorage.setItem("theme", !prev ? "dark" : "light");
-      return !prev;
+      const next = !prev;
+
+      localStorage.setItem(
+        "theme",
+        next ? "dark" : "light"
+      );
+
+      return next;
     });
   };
 
   return (
-    <div className={dark ? "app dark" : "app"}>
-
-      {/* SIDEBAR */}
+    <div
+      className={
+        dark ? "app dark" : "app"
+      }
+    >
+      {/* Sidebar */}
       <div className="sidebar">
-
-        <button className="btn new" onClick={newChat}>
+        <button
+          className="btn new"
+          onClick={newChat}
+        >
           + New Chat
         </button>
 
-        <button className="btn theme" onClick={toggleTheme}>
-          {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
+        <button
+          className="btn theme"
+          onClick={toggleTheme}
+        >
+          {dark
+            ? "☀️ Light Mode"
+            : "🌙 Dark Mode"}
         </button>
 
-        <h3>Chats</h3>
+        <h3>History</h3>sd
 
-        {sessions.map((s) => (
+        {sessions.map((session) => (
           <div
-            key={s.id}
-            className={`item ${activeId === s.id ? "active" : ""}`}
-            onClick={() => setActiveId(s.id)}
+            key={session.id}
+            className={`item ${
+              activeId === session.id
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveId(
+                session.id
+              )
+            }
           >
-            {s.title}
+            {session.title}
           </div>
         ))}
       </div>
 
-      {/* CHAT */}
+      {/* Chat Area */}
       <div className="chat">
-
         <div className="messages">
-          {activeSession?.messages.map((m, i) => (
-            <div
-              key={i}
-              className={m.role === "user" ? "user" : "ai"}
-            >
-              {m.text}
-            </div>
-          ))}
+          {activeSession?.messages.map(
+            (message, index) => (
+              <div
+                key={index}
+                className={
+                  message.role ===
+                  "user"
+                    ? "user"
+                    : "ai"
+                }
+              >
+                {message.text}
+              </div>
+            )
+          )}
 
           {loading && (
             <div className="ai typing">
@@ -143,17 +258,32 @@ function App() {
 
         <div className="inputBox">
           <input
+            type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask something..."
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Ask anything..."
+            onChange={(e) =>
+              setInput(
+                e.target.value
+              )
+            }
+            onKeyDown={(e) => {
+              if (
+                e.key === "Enter"
+              ) {
+                handleSend();
+              }
+            }}
           />
 
-          <button onClick={handleSend}>
-            Send
+          <button
+            onClick={handleSend}
+            disabled={loading}
+          >
+            {loading
+              ? "Thinking..."
+              : "Send"}
           </button>
         </div>
-
       </div>
     </div>
   );

@@ -72,12 +72,11 @@ export const searchConversations =
 
     try {
 
-      const { q } = req.query;
-
+      const query = req.query.q || req.query.query;
       const conversations =
         await Conversation.find({
           question: {
-            $regex: q,
+            $regex: query,
             $options: "i"
           }
         });
