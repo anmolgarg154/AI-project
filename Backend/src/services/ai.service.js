@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+
 dotenv.config();
 
 import OpenAI from "openai";
@@ -28,7 +29,8 @@ export const generateAIResponse = async (question) => {
 console.log("22",completion)
 
     return completion.choices[0].message.content;
-  } catch (error) {
+  } 
+  catch (error) {
     console.error(
       "OpenRouter Error:",
       error?.response?.data || error.message

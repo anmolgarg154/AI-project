@@ -4,6 +4,7 @@ export default function Sidebar({
   onSelect,
   onNewChat,
 }) {
+  s
   return (
     <div className="sidebar">
 
@@ -11,7 +12,7 @@ export default function Sidebar({
         + New Chat
       </button>
 
-      <h3>Chats</h3>
+      <h3>History</h3>
 
       {sessions.map((s) => (
         <div
