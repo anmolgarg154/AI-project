@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-const conversationSchema =
-  new mongoose.Schema(
+const conversationSchema =new mongoose.Schema(
     {
       question: {
         type: String,
@@ -18,10 +17,6 @@ const conversationSchema =
     }
   );
 
-const Conversation =
-  mongoose.model(
-    "Conversation",
-    conversationSchema
-  );
+const Conversation =mongoose.model("Conversation",conversationSchema);
 
 export default Conversation;

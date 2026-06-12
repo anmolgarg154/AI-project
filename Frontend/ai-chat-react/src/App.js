@@ -16,9 +16,7 @@ function App() {
 
   // Theme Load
   useEffect(() => {
-    const savedTheme =
-      localStorage.getItem("theme");
-
+    const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setDark(true);
     }
@@ -171,7 +169,7 @@ function App() {
     }
   };
 
-  // Theme Toggle
+  
   const toggleTheme = () => {
     setDark((prev) => {
       const next = !prev;
@@ -186,103 +184,42 @@ function App() {
   };
 
   return (
-    <div
-      className={
-        dark ? "app dark" : "app"
-      }
-    >
+    <div className={ dark ? "app dark" : "app"}>
       {/* Sidebar */}
       <div className="sidebar">
-        <button
-          className="btn new"
-          onClick={newChat}
-        >
-          + New Chat
-        </button>
+          <button className="btn new" onClick={newChat}> + New Chat</button>
 
-        <button
-          className="btn theme"
-          onClick={toggleTheme}
-        >
-          {dark
-            ? "☀️ Light Mode"
-            : "🌙 Dark Mode"}
-        </button>
+          <button className="btn theme" onClick={toggleTheme} > {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}</button>
 
-        <h3>History</h3>sd
+          <h3>History</h3>
 
-        {sessions.map((session) => (
-          <div
-            key={session.id}
-            className={`item ${
-              activeId === session.id
-                ? "active"
-                : ""
-            }`}
-            onClick={() =>
-              setActiveId(
-                session.id
-              )
-            }
-          >
-            {session.title}
-          </div>
-        ))}
+          {sessions.map((session) => (
+            <div key={session.id} className={`item ${ activeId === session.id? "active": "" }`} onClick={ () =>setActiveId(session.id )} > {session.title}</div>)) } 
       </div>
 
       {/* Chat Area */}
       <div className="chat">
-        <div className="messages">
-          {activeSession?.messages.map(
-            (message, index) => (
-              <div
-                key={index}
-                className={
-                  message.role ===
-                  "user"
-                    ? "user"
-                    : "ai"
-                }
-              >
-                {message.text}
-              </div>
-            )
-          )}
-
-          {loading && (
-            <div className="ai typing">
-              🤖 Thinking...
-            </div>
-          )}
-        </div>
+          <div className="messages">
+              {activeSession?.messages.map(
+                  (message, index) => (
+                    <div key={index} className={ message.role === "user" ? "user" : "ai"} >{message.text} </div>
+                  )
+              )}
+              {loading && (<div className="ai typing"> 🤖 Thinking... </div>)}
+          </div>
 
         <div className="inputBox">
-          <input
-            type="text"
-            value={input}
-            placeholder="Ask anything..."
-            onChange={(e) =>
-              setInput(
-                e.target.value
-              )
-            }
-            onKeyDown={(e) => {
-              if (
-                e.key === "Enter"
-              ) {
-                handleSend();
-              }
-            }}
-          />
+              <input type="text" value={input} placeholder="Ask anything..." onChange={(e) =>setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "Enter"
+                  ) {
+                    handleSend();
+                  }
+                }}
+              />
 
-          <button
-            onClick={handleSend}
-            disabled={loading}
-          >
-            {loading
-              ? "Thinking..."
-              : "Send"}
-          </button>
+              <button onClick={handleSend} disabled={loading} > {loading? "Thinking..." : "Send"} </button>
         </div>
       </div>
     </div>

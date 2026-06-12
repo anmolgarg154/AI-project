@@ -1,17 +1,12 @@
-import Conversation from
-  "../models/conversation.model.js";
+import Conversation from "../models/conversation.model.js";
 
-import {
-  generateAIResponse
-} from "../services/ai.service.js";
+import {generateAIResponse} from "../services/ai.service.js";
 
-export const askQuestion =
-  async (req, res, next) => {
-
-    try {
-console.log("0")
+export const askQuestion = async (req, res, next) => {
+  try {
+      console.log("0")
       const { question } = req.body;
-console.log("1")
+      console.log("1")
 
       if (!question) {
         return res.status(400).json({
@@ -20,19 +15,12 @@ console.log("1")
             "Question is required"
         });
       }
-console.log("2")
+      console.log("2")
 
-      const answer =
-        await generateAIResponse(
-          question
-        );
-console.log("3")
+      const answer =await generateAIResponse(question);
+      console.log("3")
 
-      const conversation =
-        await Conversation.create({
-          question,
-          answer
-        });
+      const conversation = await Conversation.create({ question, answer });
 
       res.status(200).json({
         success: true,
@@ -44,10 +32,8 @@ console.log("3")
     }
   };
 
-export const getConversations =
-  async (req, res, next) => {
-
-    try {
+export const getConversations = async (req, res, next) => {
+  try {
 
       const conversations =
         await Conversation.find()
@@ -67,9 +53,7 @@ export const getConversations =
     }
   };
 
-export const searchConversations =
-  async (req, res, next) => {
-
+export const searchConversations =async (req, res, next) => {
     try {
 
       const query = req.query.q || req.query.query;
